@@ -201,7 +201,14 @@ DEFAULT_PATTERNS = (
     "railway.app, vercel.app, netlify.app, pages.dev, workers.dev, onrender.com, "
     "fly.dev, glitch.me, herokuapp.com, appspot.com, azurewebsites.net, web.app, "
     "firebaseapp.com, deno.dev, r2.dev, supabase.co, cyclic.app, gigalixir.app, "
-    "koyeb.app, coolify.io, dokploy.com"
+    "koyeb.app, coolify.io, dokploy.com, "
+    "lowcloud.io, lowcloud.de, vibenest.net, lucity.cloud, github.dev, "
+    "app.github.dev, codespaces, "
+    "replit.dev, replit.app, repl.co, hf.space, streamlit.app, gradio.app, "
+    "trycloudflare.com, ngrok-free.app, ngrok.io, loca.lt, zeabur.app, "
+    "northflank.app, back4app.io, b4a.app, alwaysdata.net, pythonanywhere.com, "
+    "scalingo.io, scalingo.com, sealos.io, cloud.sealos.io, blitz.cloud, "
+    "dockfly.dev, render.com, github.io, gitlab.io, surge.sh, netlify.com"
 )
 
 DEAD_MARKERS = [
