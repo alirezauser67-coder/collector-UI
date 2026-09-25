@@ -1,20 +1,22 @@
 # V2Ray Deploy-Site Config Collector
 
-ابزار جمع‌آوری کانفیگ‌های رایگان V2Ray / Xray که روی سرویس‌های رایگان هاستینگ (Railway, Vercel, Netlify, Cloudflare Pages و ...) قرار دارند.
+ابزار جمع‌آوری کانفیگ‌های رایگان V2Ray / Xray (پروتکل‌های vless, vmess, trojan,
+ss, ssr, tuic, hysteria2, wireguard) که روی سرویس‌های رایگان هاستینگ قرار
+دارند — Railway, Vercel, Netlify, Cloudflare Pages و Workers, Render, Fly,
+GitHub Pages و ... — و سپس بررسی می‌کند کدام‌ها هنوز سالم و زنده هستند.
 
-این پروژه دو بخش دارد:
+> 🇬🇧 نسخه انگلیسی: [readmeEN.md](readmeEN.md)
 
-1. **نسخه گرافیکی (GUI)** برای استفاده دستی
-2. **نسخه خودکار** که هر ۲۴ ساعت یک‌بار کانفیگ‌ها را جمع‌آوری و منتشر می‌کند
+بدون هیچ وابستگی خارجی — فقط کتابخانه استاندارد پایتون.
 
 ---
 
 ## لینک سابسکریپشن خودکار
-https://raw.githubusercontent.com/alirezauser67-coder/collector-UI/main/configs.txt
 
+https://raw.githubusercontent.com/alirezauser67-coder/collector-UI/refs/heads/main/configs.txt
 
-- هر روز ساعت ۱۰ صبح UTC (حدود ۱۳:۳۰ ایران) به‌روزرسانی می‌شود
-- فقط کانفیگ‌هایی که دامنه آن‌ها متعلق به سرویس‌های رایگان است نگه داشته می‌شوند
+- هر روز ساعت ۱۰ صبح UTC (حدود ۱۳:۳۰ به وقت تهران) به‌روزرسانی می‌شود
+- فقط کانفیگ‌هایی که دامنه‌شان متعلق به سرویس‌های رایگان است نگه داشته می‌شوند
 
 ---
 
@@ -22,19 +24,126 @@ https://raw.githubusercontent.com/alirezauser67-coder/collector-UI/main/configs.
 
 | فایل | توضیح |
 |------|------|
-| `collector_ui.py` | نسخه گرافیکی (Tkinter) |
-| `scripts/collect.py` | اسکریپت خودکار جمع‌آوری |
-| `sources.txt` | لیست منابع کانفیگ |
-| `configs.txt` | خروجی نهایی سابسکریپشن |
-| `.github/workflows/build.yml` | اجرای خودکار روزانه |
+| `collector_ui.py` | نسخه گرافیکی (Tkinter) — اسکن، لیست زنده، بررسی سلامت |
+| `collect_railway.py` | نسخه خط فرمان (CLI) همین ابزار |
+| `scripts/collect.py` | اسکریپت خودکار جمع‌آوری (خروجی `configs.txt`) |
+| `sources.txt` | لیست منابع سابسکریپشن |
+| `configs.txt` | خروجی نهایی سابسکریپشن خودکار |
+| `.github/workflows/` | اجرای خودکار روزانه |
+| `requirements.txt` | خالی (فقط کتابخانه استاندارد) |
+| `README.md` / `readmeEN.md` | مستندات (فارسی / انگلیسی) |
 
 ---
 
 ## نیازمندی‌ها
 
-- Python **3.10** یا بالاتر
-- Tkinter (همراه نصب Python رسمی ویندوز موجود است)
-- اتصال به اینترنت
+- پایتون **3.10** یا بالاتر (تست‌شده روی 3.13)
+- Tkinter — همراه نصب رسمی پایتون روی ویندوز موجود است
+- اتصال به اینترنت برای دریافت منابع
 
 ```bash
-pip install -r requirements.txt
+pip install -r requirements.txt   # چیزی نصب نمی‌شود، فقط برای ابزارها
+```
+
+## اجرا
+
+```bash
+python collector_ui.py     # نسخه گرافیکی
+python collect_railway.py  # نسخه خط فرمان — منبع پیش‌فرض: configs.txt بالا
+```
+
+### مثال‌های CLI
+
+```bash
+python collect_railway.py SUB_URL [SUB_URL ...] -d railway.app -d vercel.app -o out.txt
+python collect_railway.py C:\subs\mylist.txt -d up.railway.app -v
+python collect_railway.py SUB_URL --server-only    # فقط آدرس سرور (بدون sni)
+python collect_railway.py SUB_URL --timeout 10 --insecure
+```
+
+---
+
+## راهنمای نسخه گرافیکی (GUI)
+
+### ۱) اسکن (Scan)
+
+- باکس **Subscriptions** — هر منبع در یک خط؛ فایل `.txt` محلی هم قابل استفاده است.
+  منبع پیش‌فرض (تنها یکی):
+  `https://raw.githubusercontent.com/alirezauser67-coder/collector-UI/refs/heads/main/configs.txt`
+- **`add sub:`** + دکمه `Add` — افزودن پشت سر هم (کلید Enter هم کار می‌کند)
+- **`Import subs...`** — انتخاب یک فایل `.txt`: لینک‌های داخل آن اضافه می‌شوند و
+  اگر خود فایل کانفیگ/بیس۶۴ باشد به‌عنوان منبع هم اضافه می‌شود
+- باکس **Deploy-site patterns** — با ویرگول (`railway.app, vercel.app, ...`)؛
+  پشتیبانی از `*` و `/regex/`
+- `also match sni / ws-host` (پیش‌فرض روشن) — گره‌های IP-محور که دامنه
+  `up.railway.app` فقط در پارامتر `sni=` یا `host=` آن‌هاست هم پیدا شوند
+- ردیف‌ها حین اسکن **زنده** اضافه می‌شوند و نوار پیشرفت درصدی دارد
+
+### ۲) بررسی سلامت (Check alive)
+
+اتصال TCP به سرور + درخواست HTTP به **دامنه پیداشده** (در صورت تمایل با پروکسی):
+
+| وضعیت | معنی |
+|-------|------|
+| `LIVE` | پاسخ HTTP 2xx و بدون صفحه خطای شناخته‌شده |
+| `DEAD` | HTTP 4xx/5xx یا صفحه مرده: پیام Railway *"The train has not arrived at the station."*، خطای Vercel `DEPLOYMENT_NOT_FOUND`، صفحه Netlify *"Page Not Found"* و ... |
+| `PORT OPEN` | پورت باز است ولی HTTP ندارد |
+| `DOWN` | اتصال رد شد / تایم‌اوت / خطای TLS |
+
+- `proxy` + `Test` — بررسی از طریق `http://127.0.0.1:10808` (یا هر پروکسی دیگر)
+- `threads` / `timeout` — تعداد همزمانی و مهلت هر میزبان (ثانیه)
+- نوار پیشرفت: `checking 12/40 hosts — LIVE 3 DEAD 9 ...` همراه درصد
+
+### پنل نتایج
+
+- **انتخابگر سایت (سمت چپ)** — کانفیگ‌ها بر اساس سایت گروه‌بندی می‌شوند، مثلاً
+  `railway.app (120)`، `vercel.app (35)`
+  - `only show` → با انتخاب `railway.app` **فقط** کانفیگ‌های railway.app نمایش داده می‌شوند
+  - `don't show` → آن سایت پنهان می‌شود
+  - `off` → انتخاب نادیده گرفته می‌شود
+- **`LIVE always on top`** (پیش‌فرض روشن) — کانفیگ‌های سالم بعد از هر مرتب‌سازی
+  یا پایان بررسی، همیشه بالای لیست می‌مانند
+- تیک **`show only LIVE`** — هر چیزی که `LIVE` نیست پنهان می‌شود
+- تیک **`hide duplicates`** — هر گره فقط یک بار (`type + host + port + domain`)؛
+  اگر گرهی دوبار آمده بود، نسخه `LIVE` آن نگه داشته می‌شود
+- باکس **filter** — جستجوی آزاد روی میزبان/دامنه/نوع/وضعیت/توضیح/منبع
+- شمارنده‌های بالای صفحه (`LIVE`، `DEAD`، `DOWN`، `PORT-OPEN`، `NEW`) با کلیک
+  فیلتر می‌شوند؛ `ALL` فیلتر را پاک می‌کند
+- کلیک روی ستون‌ها مرتب‌سازی (▲/▼)
+
+### دستورات کپی
+
+| عمل | نتیجه |
+|-----|-------|
+| `Copy all [Ctrl+C]` | اگر ردیفی انتخاب شده باشد → **همان انتخاب**؛ در غیر این صورت همه کانفیگ‌های نمایش‌داده‌شده (تیک `only LIVE` رعایت می‌شود) |
+| `Ctrl+C` | کپی ردیف‌های انتخاب‌شده (و اگر چیزی انتخاب نشده، همه نمایش‌داده‌شده‌ها) |
+| دبل‌کلیک | کپی ردیف (یا ردیف‌های) انتخاب‌شده |
+| `Alt + کلیک` روی یک ردیف | کپی **فقط دامنه** همان ردیف |
+| دکمه `Copy domains` | کپی فقط دامنه‌ها (سایت انتخاب‌شده، وگرنه دامنه کامل ردیف‌های نمایش‌داده‌شده) |
+
+### کلیدهای میانبر
+
+`F5` اسکن · `F6` بررسی سلامت · `Esc` توقف · `Ctrl+C` کپی
+
+### ذخیره
+
+`Save...` خروجی می‌گیرد، هر کانفیگ در یک خط (`.txt`) — به‌صورت پیش‌فرض فقط
+کانفیگ‌های `LIVE`؛ با برداشتن تیک `only LIVE` همه ذخیره می‌شوند.
+
+---
+
+## فرمت‌های سابسکریپشن قابل خواندن
+
+- متن ساده، هر لینک در یک خط
+- بیس۶یل کل فایل (مثل `All_Configs_base64_Sub.txt`)
+- بیس۶یل تو در تو و بیس۶یل شکسته‌شده در خطوط ~۷۶ کاراکتری
+- کانفیگ‌های بیس۶یل در هر خط، با یا بدون هدر `#profile-title`
+- فایل‌های `.txt` محلی
+
+## نکات
+
+- تطبیق دامنه بدون حساسیت به حروف است و روی آدرس سرور، پارامتر `sni=` / `peer=`
+  و پارامتر `host=` انجام می‌شود.
+- بررسی سلامت به **دامنه استقرار** می‌رود نه IP خام، بنابراین صفحه‌های
+  «domain not provisioned» در Railway / Vercel / Netlify به‌صورت `DEAD` دیده می‌شوند.
+- فقط از منابعی استفاده کنید که اجازه دسترسی به آن‌ها را دارید.

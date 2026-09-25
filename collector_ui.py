@@ -88,6 +88,13 @@ def match_deploy(value: str, patterns: list[re.Pattern]) -> bool:
     return bool(value) and any(p.search(value) for p in patterns)
 
 
+def site_of(domain: str) -> str:
+    """x.up.railway.app -> railway.app  (group selector value)."""
+    domain = (domain or "").strip().lower()
+    parts = domain.split(".")
+    return ".".join(parts[-2:]) if len(parts) >= 2 else domain
+
+
 def find_match(fields: dict, patterns: list[re.Pattern],
                match_any: bool) -> str:
     """Return the deploy domain found in server / sni / ws-host (or "")."""
@@ -308,8 +315,7 @@ class App:
         self.subs.configure(yscrollcommand=ssb.set)
         ssb.pack(side="right", fill="y")
         self.subs.pack(fill="both", expand=True)
-        self.subs.insert("1.0", "\n".join(DEFAULT_SUBSCRIPTIONS) +
-                         "\n# paste more sub URLs here (one per line)")
+        self.subs.insert("1.0", "\n".join(DEFAULT_SUBSCRIPTIONS))
         addf = ttk.Frame(left)
         addf.pack(fill="x", pady=(4, 0))
         ttk.Label(addf, text="add sub:").pack(side="left")
@@ -334,6 +340,18 @@ class App:
         self.filter_var.trace_add("write", lambda *_: self._render())
         ttk.Entry(rf, textvariable=self.filter_var, width=28).pack(
             side="left", padx=4)
+        self.live_top = tk.BooleanVar(value=True)
+        ttk.Checkbutton(rf, text="LIVE always on top",
+                        variable=self.live_top,
+                        command=self._render).pack(side="left", padx=(8, 0))
+        self.show_live = tk.BooleanVar(value=False)
+        ttk.Checkbutton(rf, text="show only LIVE",
+                        variable=self.show_live,
+                        command=self._render).pack(side="left", padx=(8, 0))
+        self.hide_dup = tk.BooleanVar(value=False)
+        ttk.Checkbutton(rf, text="hide duplicates",
+                        variable=self.hide_dup,
+                        command=self._render).pack(side="left", padx=(8, 0))
         self.matched_var = tk.StringVar(value="")
         ttk.Label(rf, textvariable=self.matched_var, style="Sub.TLabel").pack(
             side="left", padx=8)
@@ -347,8 +365,8 @@ class App:
 
         # ---- domain list: select a domain -> show only it (or exclude it) ----
         dpanel = ttk.LabelFrame(
-            hf, text=" Domains — click to filter, Alt+click row = copy domain ",
-            padding=4)
+            hf, text=" Sites — pick railway.app / vercel.app ... to show only "
+                     "that site ", padding=4)
         hf.add(dpanel, weight=0)
         dlistf = ttk.Frame(dpanel)
         dlistf.pack(fill="both", expand=True)
@@ -376,7 +394,7 @@ class App:
         btns.pack(fill="x", pady=(5, 0))
         ttk.Button(btns, text="Copy domains", command=self.copy_domains).pack(
             fill="x")
-        self.domains_var = tk.StringVar(value="0 domains")
+        self.domains_var = tk.StringVar(value="0 sites")
         ttk.Label(dpanel, textvariable=self.domains_var,
                   style="Sub.TLabel").pack(anchor="w", pady=(4, 0))
 
@@ -458,30 +476,62 @@ class App:
         mode = self.domain_mode.get()
         return (self._selected_domains(), mode if mode != "off" else "")
 
-    def _passes(self, r: dict, sel: set[str], mode: str) -> bool:
+    def _passes(self, r: dict, sel: set[str], mode: str,
+                show_live: bool | None = None) -> bool:
+        if (self.show_live.get() if show_live is None else show_live) \
+                and r.get("status") != "LIVE":
+            return False
         needle = self.filter_var.get().strip().lower()
         if needle and needle not in self._match_text(r):
             return False
         if sel and mode:
-            domain = r.get("domain")
-            if mode == "only" and domain not in sel:
+            site = site_of(r.get("domain", ""))
+            if mode == "only" and site not in sel:
                 return False
-            if mode == "exclude" and domain in sel:
+            if mode == "exclude" and site in sel:
                 return False
         return True
 
+    @staticmethod
+    def _dup_key(r: dict) -> str:
+        host = (r.get("host") or "").lower()
+        port = r.get("port") or ""
+        domain = (r.get("domain") or "").lower()
+        if host or domain:
+            return f"{r.get('type', '')}|{host}|{port}|{domain}"
+        return r.get("link", "")
+
+    def _dedupe(self, idxs: list[int]) -> list[int]:
+        """One row per node; a LIVE row wins over a DEAD/NEW duplicate."""
+        best: dict[str, int] = {}
+        for i in idxs:
+            key = self._dup_key(self.rows[i])
+            current = best.get(key)
+            if current is None:
+                best[key] = i
+            elif (self.rows[i]["status"] == "LIVE"
+                  and self.rows[current]["status"] != "LIVE"):
+                best[key] = i
+        return sorted(best.values())
+
     def _visible(self) -> list[int]:
         sel, mode = self._domain_ctx()
-        idxs = [i for i, r in enumerate(self.rows) if self._passes(r, sel, mode)]
+        show_live = bool(self.show_live.get())
+        idxs = [i for i, r in enumerate(self.rows)
+                if self._passes(r, sel, mode, show_live)]
+        if self.hide_dup.get():
+            idxs = self._dedupe(idxs)
         key = self.sort_col
         idxs.sort(key=lambda i: (str(self.rows[i].get(key, "")).lower(), i),
                   reverse=self.sort_desc)
+        if self.live_top.get():
+            idxs.sort(key=lambda i: 0 if self.rows[i]["status"] == "LIVE" else 1)
         return idxs
 
     def _sync_domains(self):
         counts: dict[str, int] = {}
         for r in self.rows:
-            d = r.get("domain") or r.get("host") or "?"
+            d = site_of(r.get("domain") or r.get("host") or "?")
             counts[d] = counts.get(d, 0) + 1
         if counts == getattr(self, "_domain_counts", None):
             return
@@ -495,7 +545,7 @@ class App:
         for i, d in enumerate(items):
             if d in selected:
                 self.domain_list.selection_set(i)
-        self.domains_var.set(f"{len(items)} domains")
+        self.domains_var.set(f"{len(items)} sites")
 
     def _on_domain_select(self, _event=None):
         self._render()
@@ -524,6 +574,14 @@ class App:
                            "Alt+click -> domain", noun="domain")
         return None
 
+    @staticmethod
+    def _append_line(widget: tk.Text, line: str):
+        """Append a full line (Tk 'end' index sits on the last line)."""
+        body = widget.get("1.0", "end -1c")
+        if body and not body.endswith("\n"):
+            widget.insert("end", "\n")
+        widget.insert("end", line + "\n")
+
     def add_subs(self):
         """Append subscription URLs one after another (Enter or Add)."""
         raw = self.new_sub.get().strip()
@@ -537,7 +595,7 @@ class App:
                 continue
             if (part.startswith("http") or os.path.isfile(part)) \
                     and part not in existing:
-                self.subs.insert("end", part + "\n")
+                self._append_line(self.subs, part)
                 existing.add(part)
                 added += 1
         self.new_sub.set("")
@@ -553,13 +611,20 @@ class App:
                 r["note"], r["source"])
 
     def _render(self):
+        keep = set(self.tree.selection())
         self.tree.delete(*self.tree.get_children())
+        visible: set[str] = set()
         for n, i in enumerate(self._visible()):
             r = self.rows[i]
             tags = (r["status"],) + (("alt",) if n % 2 else ())
-            self.tree.insert("", "end", iid=str(i), values=self._values(r),
+            iid = str(i)
+            self.tree.insert("", "end", iid=iid, values=self._values(r),
                              tags=tags)
-        self.matched_var.set(f"{len(self.tree.get_children())} shown")
+            visible.add(iid)
+        restored = [iid for iid in keep if iid in visible]
+        if restored:
+            self.tree.selection_set(restored)
+        self.matched_var.set(f"{len(visible)} shown")
 
     def _sort_by(self, col: str):
         if self.sort_col == col:
@@ -576,10 +641,9 @@ class App:
         sel = self.tree.selection()
         if not sel:
             return
-        link = self.rows[int(sel[0])]["link"]
-        self.root.clipboard_clear()
-        self.root.clipboard_append(link)
-        self.log_line(f"[copied] {link[:90]}")
+        links = [self.rows[int(i)]["link"] for i in sel]
+        self._to_clipboard(links, f"double-click ({len(links)} selected)"
+                           if len(links) > 1 else "double-click")
 
     def _to_clipboard(self, links: list[str], what: str, noun: str = "configs"):
         if not links:
@@ -594,7 +658,9 @@ class App:
                       f"({len(text)} chars)")
 
     def copy_all(self):
-        """Copy every visible row (respects the filter; honors 'only LIVE')."""
+        """Copy selected rows, or every visible row if none are selected."""
+        if self.tree.selection():
+            return self.copy_selected()
         idxs = self._visible()
         only_alive = bool(self.only_alive.get())
         links = [self.rows[i]["link"] for i in idxs
@@ -670,6 +736,7 @@ class App:
                     self.pbar["value"] = 0 if msg[2] else 100
                     self.pct_var.set("0%" if msg[2] else "100%")
                     self.status_var.set(msg[1])
+                    self._render()   # LIVE rows jump to the top
         except queue.Empty:
             pass
         if dirty:
@@ -721,13 +788,13 @@ class App:
             line = line.strip()
             if (line.startswith("http") or os.path.isfile(line)) \
                     and line not in existing:
-                self.subs.insert("end", line + "\n")
+                self._append_line(self.subs, line)
                 existing.add(line)
                 added += 1
         has_cfg = bool(re.search(
             r"(?im)(vless|vmess|trojan|ss|ssr|tuic|hysteria2?)://", text))
         if (added == 0 or has_cfg) and path not in existing:
-            self.subs.insert("end", path + "\n")
+            self._append_line(self.subs, path)
             added += 1
             self.log_line(f"[+] added file as subscription source: {path}")
         self.subs.see("end")
