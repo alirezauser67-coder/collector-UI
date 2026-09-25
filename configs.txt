@@ -1,7 +1,7 @@
-#profile-title: Free-Hosting-Configs
+#profile-title: notALITREZAconfigs
 #profile-update-interval: 1
-#profile-web-page-url: https://github.com/YOUR_USERNAME/Free-Hosting-Configs
-# Generated: 2026-09-25 16:12 UTC
+#profile-web-page-url: https://raw.githubusercontent.com/alirezauser67-coder/collector-UI/main/configs.txt
+# Generated: 2026-09-25 16:14 UTC
 # Total configs: 3484
 # Filter: host / sni / address must belong to free hosting platforms
 
