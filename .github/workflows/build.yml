@@ -1,0 +1,37 @@
+name: Build Free-Hosting-Configs
+
+on:
+  schedule:
+    - cron: "0 10 * * *"   # هر روز ساعت ۱۰ UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Collect configs
+        run: python scripts/collect.py
+
+      - name: Commit and push
+        run: |
+          if [ -z "$(git status --porcelain -- configs.txt configs_base64.txt)" ]; then
+            echo "No changes"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add configs.txt configs_base64.txt
+          count=$(grep -cv '^#' configs.txt || true)
+          git commit -m "Update configs ($count nodes)"
+          git push
