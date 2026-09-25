@@ -1,0 +1,163 @@
+name: E2E Config Check
+
+on:
+  schedule:
+    - cron: "30 10 * * *"   # 30 min after build.yml refreshes configs.txt
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: e2e-config
+  cancel-in-progress: false
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Run e2e with collector_ui.py
+        run: |
+          python - <<'PY'
+          import concurrent.futures
+          import sys
+          import time
+          import types
+
+          # collector_ui.py imports tkinter at module level; headless runners
+          # may not have it. Stub it just enough to import the module (no GUI
+          # is ever created — collector_ui's main() stays untouched).
+          try:
+              import tkinter  # noqa: F401
+          except Exception:
+              tk = types.ModuleType("tkinter")
+              tk.__path__ = []
+              tk.Tk = type("Tk", (), {})
+              tk.Text = type("Text", (), {})
+              for _sub in ("filedialog", "messagebox", "ttk", "font",
+                           "scrolledtext", "constants"):
+                  _m = types.ModuleType("tkinter." + _sub)
+                  setattr(tk, _sub, _m)
+                  sys.modules["tkinter." + _sub] = _m
+              sys.modules["tkinter"] = tk
+
+          import collector_ui as c
+
+          SOURCE = ("https://raw.githubusercontent.com/"
+                    "alirezauser67-coder/collector-UI/refs/heads/main/"
+                    "configs.txt")
+          OUT = "e2econfig.txt"
+          TIMEOUT = 10.0
+          WORKERS = 40
+
+          # ---- 1) same scan as the GUI: fetch + parse + match deploy sites ----
+          print(f"[1/3] fetching {SOURCE}")
+          try:
+              raw = c.fetch_source(SOURCE, 30.0, False)
+          except Exception as exc:
+              print(f"[!] fetch failed: {type(exc).__name__}: {exc}")
+              sys.exit(1)
+
+          links = c.split_links(c.normalize_subscription(raw))
+          patterns = c.parse_patterns(c.DEFAULT_PATTERNS)
+          print(f"[1/3] {len(links)} configs parsed")
+
+          rows = []
+          seen = set()
+          for link in links:
+              if link in seen:
+                  continue
+              seen.add(link)
+              fields = c.link_fields(link)
+              domain = c.find_match(fields, patterns, True)
+              if not domain:
+                  continue
+              host = (fields.get("host") or "").strip()
+              if not host:
+                  continue
+              rows.append({
+                  "link": link,
+                  "host": host,
+                  "port": fields.get("port") or "443",
+                  "domain": domain,
+                  "status": "NEW",
+              })
+          print(f"[2/3] {len(rows)} matched deploy-site nodes")
+
+          # ---- 2) same alive check as the GUI (tcp + http + dead-page) ----
+          groups = {}
+          for i, r in enumerate(rows):
+              try:
+                  port = int(r["port"])
+              except ValueError:
+                  port = 443
+              groups.setdefault((r["host"], port, r["domain"]), []).append(i)
+
+          def task(key):
+              server, port, domain = key
+              tcp_ok, tcp_err = c.tcp_open(server, port, TIMEOUT)
+              status, body, err = c.http_probe(domain or server, port,
+                                               TIMEOUT, False, "")
+              state, note = c.evaluate(status, body, tcp_ok, tcp_err or err)
+              return key, state, note
+
+          counts = {"LIVE": 0, "DEAD": 0, "DOWN": 0, "PORT OPEN": 0}
+          total = len(groups)
+          done = 0
+          started = time.time()
+          with concurrent.futures.ThreadPoolExecutor(
+                  max_workers=WORKERS) as pool:
+              for key, state, note in pool.map(task, list(groups)):
+                  done += 1
+                  counts[state] = counts.get(state, 0) + 1
+                  for i in groups[key]:
+                      rows[i]["status"] = state
+                  if done % 25 == 0 or done == total:
+                      print(f"[2/3] {done}/{total} hosts — "
+                            f"LIVE {counts['LIVE']} DEAD {counts['DEAD']} "
+                            f"DOWN {counts['DOWN']} "
+                            f"PORT-OPEN {counts['PORT OPEN']}")
+
+          # ---- 3) write only LIVE configs ----
+          live = [r["link"] for r in rows if r["status"] == "LIVE"]
+          stamp = time.strftime("%Y-%m-%d %H:%M UTC", time.gmtime())
+          header = [
+              "#profile-title: e2e-LIVE",
+              "#profile-update-interval: 1",
+              "#profile-web-page-url: "
+              "https://github.com/alirezauser67-coder/collector-UI",
+              f"# Generated: {stamp}",
+              f"# Total LIVE: {len(live)}",
+              f"# Checked: {len(rows)} nodes / {total} hosts in "
+              f"{time.time() - started:.0f}s",
+              "",
+          ]
+          with open(OUT, "w", encoding="utf-8") as fh:
+              fh.write("\n".join(header + live) + "\n")
+
+          print(f"[3/3] wrote {OUT}: {len(live)} LIVE of {len(rows)} matched")
+          if not live:
+              print("[!] no LIVE configs — writing header-only file")
+          PY
+
+      - name: Commit e2econfig.txt
+        run: |
+          if [ -z "$(git status --porcelain -- e2econfig.txt)" ]; then
+            echo "No changes"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git pull --rebase origin main
+          git add e2econfig.txt
+          live=$(grep -cv '^#' e2econfig.txt || true)
+          git commit -m "Update e2econfig ($live live nodes)"
+          git push
