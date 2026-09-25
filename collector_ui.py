@@ -1091,12 +1091,25 @@ class App:
             "proxy": self.proxy_url.get().strip(),
             "workers": max(1, int(self.threads.get())),
         }
+        idxs = list(range(len(self.rows)))
+        if only_sites is not None:
+            idxs = [i for i in idxs
+                    if site_of(self.rows[i].get("domain")
+                               or self.rows[i].get("host") or "")
+                    in only_sites]
+        if not idxs:
+            messagebox.showinfo("Nothing to check",
+                                "No rows for the selected site(s).")
+            return
+        if self.hide_dup.get():
+            unique = self._dedupe(idxs)
+            if len(unique) != len(idxs):
+                self.log_line(f"[*] hide duplicates on — checking "
+                              f"{len(unique)} unique of {len(idxs)} rows")
+            idxs = unique
         groups: dict[tuple, list[int]] = {}
-        for i, row in enumerate(self.rows):
-            if only_sites is not None:
-                site = site_of(row.get("domain") or row.get("host") or "")
-                if site not in only_sites:
-                    continue
+        for i in idxs:
+            row = self.rows[i]
             try:
                 port = int(row["port"] or 443)
             except ValueError:

@@ -107,7 +107,9 @@ TCP connect to the server + HTTP request to the **matched domain**
   the list after every sort / check
 - **`show only LIVE`** tick — hide everything that is not `LIVE`
 - **`hide duplicates`** tick — one row per node (`type + host + port + domain`);
-  when a node appears twice, the `LIVE` copy is the one that stays
+  when a node appears twice, the `LIVE` copy is the one that stays. While this
+  tick is on, the alive check (`F6` / `F7` and their buttons) also checks only
+  the unique nodes
 - **filter** box — free text over host / domain / type / status / note / source
 - counters on top (`LIVE`, `DEAD`, `DOWN`, `PORT-OPEN`, `NEW`) are clickable
   filters; `ALL` clears the filter
