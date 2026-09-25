@@ -101,6 +101,8 @@ TCP connect to the server + HTTP request to the **matched domain**
   - `only show` → selecting `railway.app` shows **only** railway.app configs
   - `don't show` → hides that site
   - `off` → ignore the selection
+  - **`Live scan site [F7]`** button → alive-checks only the selected site(s);
+    rows of every other site are left untouched
 - **`LIVE always on top`** (default on) — healthy configs stay at the top of
   the list after every sort / check
 - **`show only LIVE`** tick — hide everything that is not `LIVE`
@@ -123,7 +125,7 @@ TCP connect to the server + HTTP request to the **matched domain**
 
 ### Keyboard
 
-`F5` scan · `F6` check alive · `Esc` stop · `Ctrl+C` copy
+`F5` scan · `F6` check alive · `F7` check alive of the selected site · `Esc` stop · `Ctrl+C` copy
 
 ### Save
 

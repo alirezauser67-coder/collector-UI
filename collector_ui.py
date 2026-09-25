@@ -559,6 +559,10 @@ class App:
                             command=self._render).pack(side="left", padx=(4, 0))
         btns = ttk.Frame(dpanel)
         btns.pack(fill="x", pady=(5, 0))
+        self.b_site_check = ttk.Button(
+            btns, text="Live scan site  [F7]",
+            style="Primary.TButton", command=self.start_check_selected_site)
+        self.b_site_check.pack(fill="x", pady=(0, 3))
         ttk.Button(btns, text="Copy domains", command=self.copy_domains).pack(
             fill="x")
         self.domains_var = tk.StringVar(value="0 sites")
@@ -619,6 +623,7 @@ class App:
 
         root.bind("<F5>", lambda e: self.start_scan())
         root.bind("<F6>", lambda e: self.start_check())
+        root.bind("<F7>", lambda e: self.start_check_selected_site())
         root.bind("<Escape>", lambda e: self.stop())
         root.bind("<Control-c>", self._on_ctrl_c)
         root.bind("<Control-C>", self._on_ctrl_c)
@@ -917,6 +922,7 @@ class App:
         st = "disabled" if busy else "normal"
         self.b_scan.configure(state=st)
         self.b_check.configure(state=st)
+        self.b_site_check.configure(state=st)
         self.b_clear.configure(state=st)
         self.b_stop.configure(state="normal" if busy else "disabled")
 
@@ -1061,7 +1067,18 @@ class App:
                             f"{len(self.rows)})", stopped))
 
     # ---------------- 2) check alive ----------------
-    def start_check(self):
+    def start_check_selected_site(self):
+        """Alive-check only the site(s) selected in the Sites list."""
+        if self.busy:
+            return
+        sel = self._selected_domains()
+        if not sel:
+            messagebox.showinfo("No site selected",
+                                "Pick a site in the list first.")
+            return
+        self.start_check(only_sites=sel)
+
+    def start_check(self, only_sites: set[str] | None = None):
         if self.busy:
             return
         if not self.rows:
@@ -1076,22 +1093,34 @@ class App:
         }
         groups: dict[tuple, list[int]] = {}
         for i, row in enumerate(self.rows):
+            if only_sites is not None:
+                site = site_of(row.get("domain") or row.get("host") or "")
+                if site not in only_sites:
+                    continue
             try:
                 port = int(row["port"] or 443)
             except ValueError:
                 port = 443
             key = (row["host"], port, row.get("domain") or row["host"])
             groups.setdefault(key, []).append(i)
+        if not groups:
+            messagebox.showinfo("Nothing to check",
+                                "No rows for the selected site(s).")
+            return
         self.stop_evt.clear()
         self._set_busy(True)
         self.pbar["value"] = 0
         for idxs in groups.values():
             for i in idxs:
                 self.q.put(("status_row", i, "CHECKING", ""))
-        threading.Thread(target=self._check_worker, args=(groups, settings),
+        label = (f"site: {', '.join(sorted(only_sites))}"
+                 if only_sites else "all sites")
+        threading.Thread(target=self._check_worker,
+                         args=(groups, settings, label),
                          daemon=True).start()
 
-    def _check_worker(self, groups: dict, cfg: dict):
+    def _check_worker(self, groups: dict, cfg: dict,
+                      label: str = "all sites"):
         total = len(groups)
         done = 0
         counts = {"LIVE": 0, "DEAD": 0, "DOWN": 0, "PORT OPEN": 0}
@@ -1120,14 +1149,14 @@ class App:
                     for i in groups[key]:
                         self.q.put(("status_row", i, state, note))
                 self.q.put(("progress", 100.0 * done / total,
-                            f"checking {done}/{total} hosts — "
+                            f"checking {done}/{total} hosts ({label}) — "
                             f"LIVE {counts['LIVE']}  DEAD {counts['DEAD']}  "
                             f"DOWN {counts['DOWN']}  "
                             f"PORT-OPEN {counts['PORT OPEN']}"))
 
         stopped = self.stop_evt.is_set()
         self.q.put(("done",
-                    f"check {'stopped' if stopped else 'done'} | "
+                    f"check {'stopped' if stopped else 'done'} ({label}) | "
                     f"LIVE {counts['LIVE']}  DEAD {counts['DEAD']}  "
                     f"DOWN {counts['DOWN']}  PORT-OPEN {counts['PORT OPEN']}"
                     f"{proxy_note}", stopped))
