@@ -14,6 +14,8 @@ Run:  python collector_ui.py
 """
 
 import concurrent.futures
+import base64
+import json
 import os
 import queue
 import re
@@ -23,16 +25,174 @@ import threading
 import time
 import urllib.error
 import urllib.request
+from urllib.parse import parse_qs, unquote, urlsplit
 from tkinter import filedialog, messagebox, ttk
 import tkinter as tk
 
-from collect_railway import (
-    DEFAULT_SUBSCRIPTIONS,
-    fetch_source,
-    link_fields,
-    normalize_subscription,
-    split_links,
+# --- inlined from collect_railway.py so this file runs on its own ---
+
+DEFAULT_SUBSCRIPTIONS = [
+    "https://raw.githubusercontent.com/alirezauser67-coder/collector-UI/refs/heads/main/configs.txt",
+]
+
+SCHEMES = (
+    "vless://", "vmess://", "trojan://", "ss://", "ssr://",
+    "tuic://", "hysteria2://", "hy2://", "hysteria://", "wireguard://",
 )
+
+B64_RE = re.compile(r"^[A-Za-z0-9+/=_-]+$")
+
+LINK_LINE_RE = re.compile(
+    r"(?im)^\s*(vless|vmess|trojan|ss|ssr|tuic|hysteria2?|hy2|wireguard)://")
+
+
+def b64d(data: str) -> bytes | None:
+    data = data.strip().replace("\n", "").replace("\r", "").replace(" ", "")
+    if not data:
+        return None
+    data += "=" * (-len(data) % 4)
+    for decoder in (base64.urlsafe_b64decode, base64.b64decode):
+        try:
+            return decoder(data)
+        except Exception:
+            continue
+    return None
+
+
+def http_get(url: str, timeout: float, insecure: bool) -> bytes:
+    req = urllib.request.Request(url, headers={
+        "User-Agent": ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                       "AppleWebKit/537.36"),
+        "Accept": "*/*",
+    })
+    ctx = ssl._create_unverified_context() if insecure else None
+    with urllib.request.urlopen(req, timeout=timeout, context=ctx) as resp:
+        return resp.read()
+
+
+def fetch_source(url: str, timeout: float = 30.0, insecure: bool = False) -> str:
+    """Read a subscription from an http(s) URL or from a local .txt file."""
+    if url.lower().startswith(("http://", "https://")):
+        return http_get(url, timeout, insecure).decode("utf-8", "ignore")
+    path = url.strip().strip("\"'")
+    with open(path, encoding="utf-8", errors="ignore") as fh:
+        return fh.read()
+
+
+def looks_like_b64_line_list(text: str) -> bool:
+    lines = [l.strip() for l in text.splitlines() if l.strip()]
+    if len(lines) < 2:
+        return False
+    ok = sum(1 for l in lines
+             if len(l) > 24 and not l.startswith("#") and B64_RE.match(l))
+    return ok >= max(2, int(0.7 * len(lines)))
+
+
+def _b64_like(text: str) -> bool:
+    return len(text) > 16 and bool(B64_RE.match(text))
+
+
+def normalize_subscription(text: str) -> str:
+    """Handle plain links, base64 blob, wrapped/nested base64, per-line base64."""
+    text = text.strip().lstrip("﻿")
+    for _ in range(4):
+        if LINK_LINE_RE.search(text):
+            return text
+        if looks_like_b64_line_list(text):
+            # either per-line base64 configs, or a blob wrapped at ~76 columns:
+            # decode both ways and keep whichever yields more config links
+            per_line = split_links(text)
+            joined = b64d("".join(text.split()))
+            inner = joined.decode("utf-8", "ignore") if joined else ""
+            if inner:
+                joined_links = split_links(inner)
+                if len(joined_links) > len(per_line):
+                    text = inner
+                    continue
+            return text
+        decoded = b64d(text)
+        if not decoded:
+            return text
+        inner = decoded.decode("utf-8", "ignore").strip()
+        if not inner or inner == text:
+            return text
+        if not (LINK_LINE_RE.search(inner) or _b64_like(inner)
+                or inner.count("://") >= 2):
+            return text                      # decoding was wrong: keep original
+        text = inner
+    return text
+
+
+def split_links(text: str, _depth: int = 0) -> list[str]:
+    links: list[str] = []
+    for chunk in re.split(r"[\r\n\s]+", text):
+        chunk = chunk.strip().strip("'\";,")
+        if not chunk:
+            continue
+        if chunk.lower().startswith(SCHEMES):
+            links.append(chunk)
+            continue
+        if _depth >= 3 or not (len(chunk) > 24 and B64_RE.match(chunk)):
+            continue
+        decoded = b64d(chunk)
+        if not decoded:
+            continue
+        inner = decoded.decode("utf-8", "ignore").strip()
+        if not inner:
+            continue
+        if inner.lower().startswith(SCHEMES):
+            links.append(inner)
+        elif "://" in inner or looks_like_b64_line_list(inner):
+            links.extend(split_links(inner, _depth + 1))
+    return links
+
+
+def link_fields(link: str) -> dict:
+    """Return host/sni/host-header of a config link (best effort)."""
+    scheme = link.split("://", 1)[0].lower()
+    fields = {"host": "", "sni": "", "header_host": "", "port": ""}
+
+    if scheme == "vmess":
+        payload = link.split("://", 1)[1].split("#", 1)[0]
+        raw = b64d(payload)
+        if not raw:
+            return fields
+        try:
+            obj = json.loads(raw.decode("utf-8", "ignore"))
+        except Exception:
+            return fields
+        fields["host"] = str(obj.get("add") or "")
+        fields["port"] = str(obj.get("port") or "")
+        fields["sni"] = str(obj.get("sni") or obj.get("host") or "")
+        return fields
+
+    if scheme == "ssr":
+        payload = link.split("://", 1)[1].split("#", 1)[0]
+        raw = b64d(payload)
+        if raw:
+            body = raw.decode("utf-8", "ignore")
+            if ":" in body:
+                fields["host"] = (body.rsplit(":", 1)[0]
+                                  .rsplit("/", 1)[-1].split(":")[0])
+        return fields
+
+    try:
+        parts = urlsplit(link)
+        fields["host"] = parts.hostname or ""
+        fields["port"] = str(parts.port or "")
+        qs = parse_qs(parts.query)
+        get = lambda k: (qs.get(k) or [""])[0]
+        fields["sni"] = get("sni") or get("peer") or get("servername")
+        fields["header_host"] = get("host")
+        if not fields["header_host"] and parts.query:
+            fields["header_host"] = parse_qs(
+                unquote(parts.query)).get("host", [""])[0]
+    except Exception:
+        pass
+    return fields
+
+
+# ------------------------------------------------------- end inlined section
 
 UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
       "(KHTML, like Gecko) Chrome/124.0 Safari/537.36")
