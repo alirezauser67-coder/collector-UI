@@ -20,6 +20,7 @@ from urllib.parse import unquote, quote
 # ====================== CONFIG ======================
 
 ALLOWED_DOMAINS = [
+    # قبلی‌ها
     "railway.app",
     "vercel.app",
     "netlify.app",
@@ -41,6 +42,46 @@ ALLOWED_DOMAINS = [
     "koyeb.app",
     "coolify.io",
     "dokploy.com",
+
+    # جدید - پیشنهاد تو + رایج‌های پنل
+    "lowcloud.io",
+    "lowcloud.de",
+    "vibenest.net",
+    "lucity.cloud",
+    "github.dev",          # GitHub Codespaces
+    "app.github.dev",
+    "codespaces",
+
+    # پلتفرم‌های خیلی رایج برای پنل
+    "replit.dev",
+    "replit.app",
+    "repl.co",
+    "hf.space",            # Hugging Face Spaces
+    "streamlit.app",
+    "gradio.app",
+    "trycloudflare.com",   # cloudflared tunnel
+    "ngrok-free.app",
+    "ngrok.io",
+    "loca.lt",
+    "zeabur.app",
+    "northflank.app",
+    "back4app.io",
+    "b4a.app",
+    "alwaysdata.net",
+    "pythonanywhere.com",
+    "scalingo.io",
+    "scalingo.com",
+    "sealos.io",
+    "cloud.sealos.io",
+    "blitz.cloud",
+    "dockfly.dev",
+    "render.com",          # گاهی مستقیم render.com هم میاد
+
+    # صفحات استاتیک / دیگه
+    "github.io",
+    "gitlab.io",
+    "surge.sh",
+    "netlify.com",
 ]
 
 SOURCES_FILE = "sources.txt"
