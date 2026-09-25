@@ -46,8 +46,8 @@ ALLOWED_DOMAINS = [
 SOURCES_FILE = "sources.txt"
 OUTPUT_FILE = "configs.txt"
 OUTPUT_BASE64 = "configs_base64.txt"
-PROFILE_TITLE = "Free-Hosting-Configs"
-PROFILE_URL = "https://github.com/YOUR_USERNAME/Free-Hosting-Configs"  # ← تغییر بده
+PROFILE_TITLE = "notALITREZAconfigs"
+PROFILE_URL = "https://raw.githubusercontent.com/alirezauser67-coder/collector-UI/main/configs.txt"  # ← تغییر بده
 
 FETCH_TIMEOUT = 40
 FETCH_RETRIES = 3
