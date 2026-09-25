@@ -3,6 +3,7 @@
 # ============================================================
 
 # Big Aggregators
+https://raw.githubusercontent.com/ebrasha/free-v2ray-public-list/refs/heads/main/vless_configs.txt
 https://raw.githubusercontent.com/0xRadikal/Free-v2ray-Configs/main/all/configs.txt
 https://raw.githubusercontent.com/0xRadikal/Free-v2ray-Configs/main/heavy/configs.txt
 https://github.com/Delta-Kronecker/V2ray-Config/raw/refs/heads/main/config/all_configs.txt
