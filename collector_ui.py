@@ -373,26 +373,141 @@ class App:
         self.root.after(50, self._poll)
 
     # ---------------- styles / layout ----------------
+    THEME = {
+        "dark": {
+            "bg": "#1e1f22", "frame": "#26272b", "widget": "#1b1c1f",
+            "entry": "#111214", "badge": "#33363b", "head": "#3b3d41",
+            "btn": "#3b3d41", "fg": "#d7d7d7", "dim": "#9aa0a6",
+            "strong": "#e8eaed", "btn_fg": "#e6e6e6", "alt": "#202124",
+            "accent": "#58a6ff", "live": "#3fb950", "dead": "#f85149",
+            "down": "#d29922", "port": "#9aa0a6", "check": "#58a6ff",
+            "new": "#8b949e", "log_bg": "#141414", "log_fg": "#d7d7d7",
+        },
+        "light": {
+            "bg": "#ececec", "frame": "#ececec", "widget": "#ffffff",
+            "entry": "#ffffff", "badge": "#f5f5f5", "head": "#dcdad5",
+            "btn": "#e1e1e1", "fg": "#1a1a1a", "dim": "#444444",
+            "strong": "#000000", "btn_fg": "#111111", "alt": "#f4f6fa",
+            "accent": "#0057b8", "live": "#0a7d2f", "dead": "#c1121f",
+            "down": "#b26a00", "port": "#555555", "check": "#0057b8",
+            "new": "#444444", "log_bg": "#141414", "log_fg": "#d7d7d7",
+        },
+    }
+
     @staticmethod
     def _styles(root):
         try:
             ttk.Style(root).theme_use("clam")
         except Exception:
             pass
-        s = ttk.Style(root)
-        s.configure("TButton", padding=(10, 4))
-        s.configure("Primary.TButton", padding=(12, 5), font=("Segoe UI", 9, "bold"))
-        s.configure("Header.TLabel", font=("Segoe UI", 14, "bold"))
-        s.configure("Sub.TLabel", font=("Segoe UI", 9))
-        s.configure("Badge.TLabel", font=("Consolas", 10, "bold"), padding=(9, 3))
-        s.configure("LiveBadge.TLabel", foreground="#0a7d2f")
-        s.configure("DeadBadge.TLabel", foreground="#c1121f")
-        s.configure("DownBadge.TLabel", foreground="#b26a00")
-        s.configure("PortBadge.TLabel", foreground="#444444")
-        s.configure("NewBadge.TLabel", foreground="#0057b8")
-        s.configure("Treeview", rowheight=21, font=("Consolas", 9))
-        s.configure("Treeview.Heading", font=("Segoe UI", 9, "bold"))
-        s.configure("status.TLabel", font=("Segoe UI", 9))
+
+    def _apply_theme(self, dark: bool = True):
+        """Dark is the default; the header button flips to light."""
+        self.dark = dark
+        p = self.THEME["dark" if dark else "light"]
+        self.root.configure(bg=p["bg"])
+        s = ttk.Style(self.root)
+        opts = {
+            "TFrame": dict(background=p["frame"]),
+            "TLabel": dict(background=p["frame"], foreground=p["fg"]),
+            "TLabelframe": dict(background=p["frame"], foreground=p["fg"]),
+            "TLabelframe.Label": dict(background=p["frame"],
+                                      foreground=p["strong"]),
+            "TButton": dict(padding=(10, 4), background=p["btn"],
+                            foreground=p["btn_fg"], focuscolor=p["frame"],
+                            lightcolor=p["btn"], darkcolor=p["btn"],
+                            bordercolor=p["btn"]),
+            "Primary.TButton": dict(padding=(12, 5),
+                                    font=("Segoe UI", 9, "bold"),
+                                    background=p["btn"],
+                                    foreground=p["btn_fg"],
+                                    focuscolor=p["frame"],
+                                    lightcolor=p["btn"], darkcolor=p["btn"],
+                                    bordercolor=p["btn"]),
+            "TCheckbutton": dict(background=p["frame"], foreground=p["fg"],
+                                 focuscolor=p["frame"]),
+            "TRadiobutton": dict(background=p["frame"], foreground=p["fg"],
+                                 focuscolor=p["frame"]),
+            "TEntry": dict(fieldbackground=p["entry"], foreground=p["fg"],
+                           insertcolor=p["fg"], background=p["frame"]),
+            "TSpinbox": dict(fieldbackground=p["entry"], foreground=p["fg"],
+                             insertcolor=p["fg"], background=p["frame"],
+                             arrowcolor=p["fg"]),
+            "TProgressbar": dict(troughcolor=p["entry"],
+                                 background=p["accent"]),
+            "TSeparator": dict(background=p["frame"]),
+            "Vertical.TScrollbar": dict(background=p["btn"],
+                                        troughcolor=p["frame"],
+                                        arrowcolor=p["fg"],
+                                        activebackground=p["head"]),
+            "Horizontal.TScrollbar": dict(background=p["btn"],
+                                          troughcolor=p["frame"],
+                                          arrowcolor=p["fg"],
+                                          activebackground=p["head"]),
+            "Treeview": dict(background=p["widget"],
+                             fieldbackground=p["widget"],
+                             foreground=p["fg"], rowheight=21,
+                             font=("Consolas", 9)),
+            "Treeview.Heading": dict(background=p["head"],
+                                     foreground=p["btn_fg"],
+                                     lightcolor=p["head"],
+                                     darkcolor=p["head"],
+                                     font=("Segoe UI", 9, "bold")),
+            "Header.TLabel": dict(font=("Segoe UI", 14, "bold"),
+                                  background=p["frame"],
+                                  foreground=p["strong"]),
+            "Sub.TLabel": dict(font=("Segoe UI", 9),
+                               background=p["frame"], foreground=p["dim"]),
+            "status.TLabel": dict(font=("Segoe UI", 9),
+                                  background=p["frame"],
+                                  foreground=p["dim"]),
+            "Badge.TLabel": dict(font=("Consolas", 10, "bold"),
+                                 padding=(9, 3), background=p["badge"],
+                                 foreground=p["fg"]),
+            "LiveBadge.TLabel": dict(font=("Consolas", 10, "bold"),
+                                     padding=(9, 3), background=p["badge"],
+                                     foreground=p["live"]),
+            "DeadBadge.TLabel": dict(font=("Consolas", 10, "bold"),
+                                     padding=(9, 3), background=p["badge"],
+                                     foreground=p["dead"]),
+            "DownBadge.TLabel": dict(font=("Consolas", 10, "bold"),
+                                     padding=(9, 3), background=p["badge"],
+                                     foreground=p["down"]),
+            "PortBadge.TLabel": dict(font=("Consolas", 10, "bold"),
+                                     padding=(9, 3), background=p["badge"],
+                                     foreground=p["port"]),
+            "NewBadge.TLabel": dict(font=("Consolas", 10, "bold"),
+                                    padding=(9, 3), background=p["badge"],
+                                    foreground=p["new"]),
+        }
+        for name, cfg in opts.items():
+            try:
+                s.configure(name, **cfg)
+            except tk.TclError:
+                pass
+
+        for w in (self.subs, self.pats):
+            w.configure(bg=p["entry"], fg=p["fg"],
+                        insertbackground=p["fg"],
+                        selectbackground=p["accent"],
+                        selectforeground=p["entry"])
+        self.domain_list.configure(bg=p["entry"], fg=p["fg"],
+                                   selectbackground=p["accent"],
+                                   selectforeground=p["entry"])
+        self.log.configure(bg=p["log_bg"], fg=p["log_fg"],
+                           insertbackground=p["log_fg"],
+                           selectbackground=p["accent"],
+                           selectforeground=p["entry"])
+        for tag, key in (("LIVE", "live"), ("DEAD", "dead"),
+                         ("DOWN", "down"), ("PORT OPEN", "port"),
+                         ("CHECKING", "check"), ("NEW", "new")):
+            self.tree.tag_configure(tag, foreground=p[key])
+        self.tree.tag_configure("alt", background=p["alt"])
+        self.theme_btn.configure(
+            text=f"Theme: {'Dark' if dark else 'Light'}")
+
+    def toggle_theme(self):
+        self._apply_theme(not getattr(self, "dark", True))
 
     def _build(self, root):
         # ---------- header ----------
@@ -423,6 +538,10 @@ class App:
                 b.bind("<Leave>", lambda e: b.configure(relief="ridge"))
             self.badges = getattr(self, "badges", {})
             self.badges[key] = b
+
+        self.theme_btn = ttk.Button(head, text="Theme: Dark",
+                                    command=self.toggle_theme)
+        self.theme_btn.pack(side="right", padx=(0, 8))
 
         # ---------- toolbar ----------
         bar = ttk.Frame(root, padding=(10, 4))
@@ -627,6 +746,8 @@ class App:
         root.bind("<Escape>", lambda e: self.stop())
         root.bind("<Control-c>", self._on_ctrl_c)
         root.bind("<Control-C>", self._on_ctrl_c)
+
+        self._apply_theme(True)          # dark mode is the default
 
     # ---------------- helpers ----------------
     def log_line(self, text: str):

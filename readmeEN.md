@@ -65,6 +65,9 @@ python collect_railway.py SUB_URL --timeout 10 --insecure
 
 ## GUI
 
+- **Dark mode by default** — the UI starts dark; the `Theme: Dark/Light`
+  button in the top-right corner flips between dark and light
+
 ### 1) Scan
 
 - **Subscriptions** box — one source per line; local `.txt` files work too.
