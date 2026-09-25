@@ -13,6 +13,8 @@ domains (railway / vercel / netlify / ...), and live e2e check whether each node
 Run:  python collector_ui.py
 """
 
+__version__ = "2.0.0"
+
 import concurrent.futures
 import base64
 import json
@@ -345,7 +347,7 @@ def proxy_works(proxy_url: str, timeout: float) -> tuple[bool, str]:
 class App:
     def __init__(self, root: tk.Tk):
         self.root = root
-        root.title("V2Ray Deploy-Site Collector + E2E Checker")
+        root.title(f"V2Ray Deploy-Site Collector + E2E Checker v{__version__}")
         root.geometry("1320x840")
         root.minsize(960, 620)
 
