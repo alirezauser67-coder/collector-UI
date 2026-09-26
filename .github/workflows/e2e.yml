@@ -173,8 +173,8 @@ jobs:
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git pull --rebase origin main
-          git add e2econfig.txt
           live=$(grep -cv '^#' e2econfig.txt || true)
+          git add e2econfig.txt
           git commit -m "Update e2econfig ($live live nodes)"
+          git pull --rebase origin main
           git push
