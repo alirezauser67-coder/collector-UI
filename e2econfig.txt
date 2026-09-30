@@ -1,19 +1,17 @@
 #profile-title: e2e-LIVE
 #profile-update-interval: 1
 #profile-web-page-url: https://github.com/alirezauser67-coder/collector-UI
-# Generated: 2026-09-29 16:34 UTC
-# Total LIVE: 12
-# Checked: 536 nodes / 536 hosts in 8s
+# Generated: 2026-09-30 16:27 UTC
+# Total LIVE: 10
+# Checked: 504 nodes / 504 hosts in 9s
 
 vless://01babcff-30b8-66f9-362a-d4081f928583@faultpass-panel-production-2bad.up.railway.app:443?encryption=none&security=tls&sni=faultpass-panel-production-2bad.up.railway.app&fp=chrome&alpn=http/1.1&type=ws&path=/ws/01babcff-30b8-66f9-362a-d4081f928583&host=faultpass-panel-production-2bad.up.railway.app#
-vless://13341149-f2f1-9ba2-31ae-f64a1206ad57@victoryprovpn-production-1ae4.up.railway.app:443?path=%2Fws%2F13341149-f2f1-9ba2-31ae-f64a1206ad57&security=tls&alpn=http%2F1.1&encryption=none&insecure=0&host=victoryprovpn-production-1ae4.up.railway.app&fp=ios&type=ws&allowInsecure=0&sni=victoryprovpn-production-1ae4.up.railway.app#
-vless://49c10bde-4905-63bc-1af1-fb1449af9029@faultpass-panel-production-531a.up.railway.app:443?encryption=none&security=tls&sni=faultpass-panel-production-531a.up.railway.app&fp=chrome&alpn=http/1.1&type=ws&path=/ws/49c10bde-4905-63bc-1af1-fb1449af9029&host=faultpass-panel-production-531a.up.railway.app#
+vless://0a09f3f3-c573-244a-3275-47a5fc06faa1@gdtreu-production.up.railway.app:443?path=/ws/0a09f3f3-c573-244a-3275-47a5fc06faa1&security=tls&alpn=http/1.1&encryption=none&insecure=0&host=gdtreu-production.up.railway.app&fp=chrome&type=ws&allowInsecure=0&sni=gdtreu-production.up.railway.app#
+vless://14535a79-1ce0-c9e7-bffa-4b623a4e1f6b@faultpass-panel-production-3edf.up.railway.app:443?encryption=none&security=tls&sni=faultpass-panel-production-3edf.up.railway.app&fp=chrome&alpn=http/1.1&type=ws&path=/ws/14535a79-1ce0-c9e7-bffa-4b623a4e1f6b&host=faultpass-panel-production-3edf.up.railway.app#
 vless://6552c7c3-e47c-ead9-ea72-1cd5f48a6f43@vodiwalkerpanel-production-d2bb.up.railway.app:443?path=/ws/6552c7c3-e47c-ead9-ea72-1cd5f48a6f43&security=tls&alpn=http/1.1&encryption=none&host=vodiwalkerpanel-production-d2bb.up.railway.app&fp=chrome&type=ws&sni=vodiwalkerpanel-production-d2bb.up.railway.app#
 vless://9b474d5f-9387-32a6-aaf8-ddc626b4012f@vodiwalkerpanel-production-d01c.up.railway.app:443?path=/ws/9b474d5f-9387-32a6-aaf8-ddc626b4012f&security=tls&alpn=http/1.1&encryption=none&insecure=0&host=vodiwalkerpanel-production-d01c.up.railway.app&fp=chrome&type=ws&allowInsecure=0&sni=vodiwalkerpanel-production-d01c.up.railway.app#
+vless://c584bf70-aff7-f3f1-46ac-bee9d364bf2e@sfertd-production.up.railway.app:443?path=%2Fws%2Fc584bf70-aff7-f3f1-46ac-bee9d364bf2e&security=tls&alpn=http%2F1.1&encryption=none&insecure=0&host=sfertd-production.up.railway.app&fp=ios&type=ws&allowInsecure=0&sni=sfertd-production.up.railway.app#
 vless://f40ef9e3-ce9d-438f-a421-2b3f3361c86a@hollowcon6.onrender.com:443?encryption=none&security=tls&sni=hollowcon6.onrender.com&fp=chrome&alpn=http/1.1&insecure=0&allowInsecure=0&type=ws&host=hollowcon6.onrender.com&path=/ws/f40ef9e3-ce9d-438f-a421-2b3f3361c86a#
 trojan://humanity@render.com:443?path=/assignment#US
-vless://b2c775c5-32d7-498a-ba66-ae71041a8201@69.46.46.91:443?path=/SideRail/ws-9DHAoSHe&security=tls&alpn=http/1.1&encryption=none&insecure=0&host=siderail-production-1833.up.railway.app&fp=chrome&type=ws&allowInsecure=0&sni=siderail-production-1833.up.railway.app#US
-vless://70863add-abc4-8339-41b8-d615daaceefa@69.46.46.95:443?security=tls&sni=vodiwalkerpanel-production-688e.up.railway.app&type=ws&host=vodiwalkerpanel-production-688e.up.railway.app&path=%2Fws%2F70863add-abc4-8339-41b8-d615daaceefa&fp=chrome&alpn=http%2F1.1&allowInsecure=0#@DeltaKroneckerGithub
-trojan://%68%75%6D%61%6E%69%74%79@216.24.57.1:443?security=tls&sni=render.com&type=ws&host=www.ignitelimit.com&path=%2Fassignment&allowInsecure=1#🔒
-vless://25@69.46.46.89:443?path=/ws/25&security=tls&encryption=none&alpn=http/1.1&host=net-788e2f-511143-production.up.railway.app&fp=chrome&type=ws&sni=net-788e2f-511143-production.up.railway.app#🇺🇸US-🚀@VPNine1
+vless://f5be20ee-1960-433c-aaf6-78b4650da0d2@bo-c0ys.onrender.com:443?path=/vless-ws&security=tls&encryption=none&insecure=0&type=ws&allowInsecure=0#@DeltaKroneckerGithub
 vless://0b576568-a04b-e5b4-b6d3-ca0be21187e2@vodiwalkerpanel-production-2958.up.railway.app:443?security=tls&fp=randomized&allowInsecure=0&insecure=0&sni=vodiwalkerpanel-production-2958.up.railway.app&type=ws&alpn=http%2F1.1&host=vodiwalkerpanel-production-2958.up.railway.app&path=%2Fws%2F0b576568-a04b-e5b4-b6d3-ca0be21187e2&encryption=none#%40eacitri
