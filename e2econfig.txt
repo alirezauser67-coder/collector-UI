@@ -1,17 +1,16 @@
 #profile-title: e2e-LIVE
 #profile-update-interval: 1
 #profile-web-page-url: https://github.com/alirezauser67-coder/collector-UI
-# Generated: 2026-10-05 19:20 UTC
-# Total LIVE: 20
-# Checked: 460 nodes / 460 hosts in 17s
+# Generated: 2026-10-06 16:52 UTC
+# Total LIVE: 19
+# Checked: 445 nodes / 445 hosts in 17s
 
 vless://00301b65f84df8f7e7e5e7735bcd53d2@69.46.46.71:443?path=/ws/00301b65f84df8f7e7e5e7735bcd53d2&security=tls&alpn=http/1.1&encryption=none&host=net-a3a68d-9dc8b8-production.up.railway.app&fp=chrome&type=ws&sni=net-a3a68d-9dc8b8-production.up.railway.app#
-vless://0913f566-ab62-4637-9783-d571273c093e@pasarguard17-production.up.railway.app:443?encryption=none&security=tls&type=ws&headerType=none&path=%2Fws%2F7a5a21d9-60f9-4542-943e-7838b90169e1%3Fed%3D2560&host=pasarguard17-production.up.railway.app&sni=pasarguard17-production.up.railway.app&fp=chrome&alpn=http%2F1.1#
-vless://675008f1-26f2-bb46-35cb-5af520bef43c@faultpass-panel-production-2f75.up.railway.app:443?encryption=none&security=tls&sni=faultpass-panel-production-2f75.up.railway.app&fp=chrome&alpn=http/1.1&type=ws&path=/ws/675008f1-26f2-bb46-35cb-5af520bef43c&host=faultpass-panel-production-2f75.up.railway.app#
+vless://0c8d75d0-515f-cbbc-efd4-534b01735653@loky14-production.up.railway.app:443?alpn=http%2F1.1&fp=chrome&host=loky14-production.up.railway.app&path=%2Fws%2F0c8d75d0-515f-cbbc-efd4-534b01735653&security=tls&sni=loky14-production.up.railway.app&type=ws#
 vless://f40ef9e3-ce9d-438f-a421-2b3f3361c86a@hollowcon6.onrender.com:443?encryption=none&security=tls&sni=hollowcon6.onrender.com&fp=chrome&alpn=http/1.1&insecure=0&allowInsecure=0&type=ws&host=hollowcon6.onrender.com&path=/ws/f40ef9e3-ce9d-438f-a421-2b3f3361c86a#
+vless://fa0db409-8ee1-cdd6-3511-969a528ebf91@gfdyg87-production.up.railway.app:443?alpn=http%2F1.1&fp=chrome&host=gfdyg87-production.up.railway.app&path=%2Fws%2Ffa0db409-8ee1-cdd6-3511-969a528ebf91&security=tls&sni=gfdyg87-production.up.railway.app&type=ws#
 trojan://humanity@render.com:443?path=/assignment?ed#US
 trojan://vUMFCo5ghEArq09bxy8NuLL3lQtqFRHE@mr-amir-production-e40d.up.railway.app:443?path=/live/f9f5cb4f-a2ce-42eb-8dfb-b3dc2746ef28?ed=2560&security=tls&alpn=http/1.1&insecure=0&host=mr-amir-production-e40d.up.railway.app&fp=chrome&type=ws&allowInsecure=0&sni=mr-amir-production-e40d.up.railway.app#US
-trojan://WSwaB9UaGoyIA8uuOzlCP-XWol8AFmDw@aynaz28-montatybgo-shop-ir-production.up.railway.app:443?path=/live/444ace3f-4b30-4264-b4a5-ace7f2a50498?ed=2560&security=tls&alpn=http/1.1&insecure=0&host=aynaz28-montatybgo-shop-ir-production.up.railway.app&fp=chrome&type=ws&allowInsecure=0&sni=aynaz28-montatybgo-shop-ir-production.up.railway.app#US
 vless://0492946ba1b9cebb15516a1136d30045@69.46.46.71:443?path=/ws/0492946ba1b9cebb15516a1136d30045&security=tls&alpn=http/1.1&encryption=none&host=net-7a9ed4-1d0d16-production.up.railway.app&fp=chrome&type=ws&sni=net-7a9ed4-1d0d16-production.up.railway.app#US
 vless://2fbd22b4b4f53632cdb1ce8aeeae8b5c@69.46.46.71:443?path=/ws/2fbd22b4b4f53632cdb1ce8aeeae8b5c&security=tls&alpn=http/1.1&encryption=none&host=srv-16eb07-23a65a-production.up.railway.app&fp=chrome&type=ws&sni=srv-16eb07-23a65a-production.up.railway.app#US
 vless://4721f64ffe78862f3920b5b35c8f3d52@69.46.46.71:443?path=/ws/4721f64ffe78862f3920b5b35c8f3d52&security=tls&alpn=http/1.1&encryption=none&host=web-f1f020-4cf484-production.up.railway.app&fp=chrome&type=ws&sni=web-f1f020-4cf484-production.up.railway.app#US
@@ -21,7 +20,7 @@ vless://a30d9de0de3eb23027539877737a9b53@69.46.46.71:443?path=/ws/a30d9de0de3eb2
 vless://ad85ad6e744e1f86aa93c5366db6e232@69.46.46.71:443?path=/ws/ad85ad6e744e1f86aa93c5366db6e232&security=tls&alpn=http/1.1&encryption=none&host=core-416959-e3ee42-production.up.railway.app&fp=chrome&type=ws&sni=core-416959-e3ee42-production.up.railway.app#US
 vless://e4b47a28b5aa1119618cc746dbe1f478@69.46.46.71:443?path=/ws/e4b47a28b5aa1119618cc746dbe1f478&security=tls&alpn=http/1.1&encryption=none&host=web-5f5ded-949fa6-production.up.railway.app&fp=chrome&type=ws&sni=web-5f5ded-949fa6-production.up.railway.app#US
 trojan://vUMFCo5ghEArq09bxy8NuLL3lQtqFRHE@69.46.46.44:443?security=tls&sni=mr-amir-production-e40d.up.railway.app&type=ws&host=mr-amir-production-e40d.up.railway.app&path=%2Flive%2Ff9f5cb4f-a2ce-42eb-8dfb-b3dc2746ef28%3Fed%3D2560&fp=safari&alpn=http%2F1.1&allowInsecure=0#🔒
+vless://0913f566-ab62-4637-9783-d571273c093e@pasarguard17-production.up.railway.app:443?encryption=none&security=tls&type=ws&headerType=none&path=%2Fws%2F7a5a21d9-60f9-4542-943e-7838b90169e1%3Fed%3D2560&host=pasarguard17-production.up.railway.app&sni=pasarguard17-production.up.railway.app&fp=chrome&alpn=http%2F1.1#Config
 vless://075cb52c-5c34-6f40-6751-acab6ce6fbff@ahbpanel-production-2002.up.railway.app:443?encryption=none&security=tls&type=ws&host=ahbpanel-production-2002.up.railway.app&path=%2Fws%2F075cb52c-5c34-6f40-6751-acab6ce6fbff&sni=ahbpanel-production-2002.up.railway.app&alpn=http%2F1.1&fp=chrome#%F0%9F%87%BA%F0%9F%87%B8%20AetrisVPN
 vless://8e4c2aea-25bd-274d-dd9b-62ac4e77f86d@69.46.46.50:443?encryption=none&security=tls&sni=newyork-production-efa3.up.railway.app&fp=ios&alpn=http%2F1.1&type=ws&host=newyork-production-efa3.up.railway.app&path=%2Fws%2F8e4c2aea-25bd-274d-dd9b-62ac4e77f86d
 vless://0b576568-a04b-e5b4-b6d3-ca0be21187e2@vodiwalkerpanel-production-2958.up.railway.app:443?security=tls&fp=randomized&allowInsecure=0&insecure=0&sni=vodiwalkerpanel-production-2958.up.railway.app&type=ws&alpn=http%2F1.1&host=vodiwalkerpanel-production-2958.up.railway.app&path=%2Fws%2F0b576568-a04b-e5b4-b6d3-ca0be21187e2&encryption=none#%40eacitri
-vless://e362a6aa-4aa9-4811-a9ee-3e8372aabcd5@pablo-panel-production-1186.up.railway.app:443?path=/ws/e362a6aa-4aa9-4811-a9ee-3e8372aabcd5&security=tls&alpn=http/1.1&encryption=none&insecure=0&host=pablo-panel-production-1186.up.railway.app&fp=chrome&type=ws&allowInsecure=0&sni=pablo-panel-production-1186.up.railway.app#🇺🇸US-🚀@VPNine1
