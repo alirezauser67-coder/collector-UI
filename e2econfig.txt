@@ -1,10 +1,11 @@
 #profile-title: e2e-LIVE
 #profile-update-interval: 1
 #profile-web-page-url: https://github.com/alirezauser67-coder/collector-UI
-# Generated: 2026-11-05 18:09 UTC
-# Total LIVE: 3
-# Checked: 400 nodes / 400 hosts in 2s
+# Generated: 2026-11-06 17:37 UTC
+# Total LIVE: 4
+# Checked: 429 nodes / 429 hosts in 8s
 
+vless://992bff49-5354-0b5c-7138-a47b045a1477@multipanel-production-f5dd.up.railway.app:443?encryption=none&security=tls&sni=multipanel-production-f5dd.up.railway.app&fp=chrome&alpn=http/1.1&type=ws&path=/ws/992bff49-5354-0b5c-7138-a47b045a1477&host=multipanel-production-f5dd.up.railway.app#SG
 vless://f40ef9e3-ce9d-438f-a421-2b3f3361c86a@hollowcon6.onrender.com:443?encryption=none&security=tls&sni=hollowcon6.onrender.com&fp=chrome&alpn=http/1.1&insecure=0&allowInsecure=0&type=ws&host=hollowcon6.onrender.com&path=/ws/f40ef9e3-ce9d-438f-a421-2b3f3361c86a#US
-vless://56b91517-eecb-4e9f-b064-4474ebaef8c8@render.com:443?path=%2F%3Fed%3D2560%23Telegram---PLANB_NET---PLANB_NET---PLANB_NET---PLANB_NET&security=tls&alpn=http%2F1.1&encryption=none&insecure=0&host=hv-igeuff3q.hamuikg3yuv.workers.dev&fp=chrome&type=ws&allowInsecure=0&sni=hv-igeuff3q.hamuikg3yuv.workers.dev#@DeltaKroneckerGithub
-vless://1f2961e0-dfbc-4ca2-8989-f2d07e70a16c@pablo-panel-production-6fcd.up.railway.app:443?encryption=none&security=tls&sni=pablo-panel-production-6fcd.up.railway.app&fp=random&alpn=http%2F1.1&type=ws&path=%2Fws%2F1f2961e0-dfbc-4ca2-8989-f2d07e70a16c&host=pablo-panel-production-6fcd.up.railway.app#@DeltaKroneckerGithub
+vless://d0048e27-e3f9-b5f6-0041-da173b3be932@sys-827407-4068cc-production.up.railway.app:443?path=/ws/d0048e27-e3f9-b5f6-0041-da173b3be932&security=tls&alpn=http/1.1&encryption=none&host=sys-827407-4068cc-production.up.railway.app&fp=chrome&type=ws&sni=sys-827407-4068cc-production.up.railway.app#🔥Join+Telegram:@Farah_VPN🟣
+trojan://humanity@render.com:443?allowInsecure=0&sni=www.ignitelimit.com&ws=1&wspath=%2Fassignment#RELAY%F0%9F%9A%A9%20%7C%20www.ignitelimit.com-443%20%7C%20105.51ms
